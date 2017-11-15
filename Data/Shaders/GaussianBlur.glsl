@@ -1,0 +1,40 @@
+-- Vertex
+
+uniform mat4 mvpMatrix;
+attribute vec4 position;
+attribute vec2 texcoord;
+varying vec2 fragTexCoord;
+
+void main()
+{
+	fragTexCoord = texcoord;
+	gl_Position = mvpMatrix * position;
+}
+
+-- Fragment
+
+uniform sampler2D texture;
+varying vec2 fragTexCoord;
+
+// Values for perfect weights and offset that utilize bilinear texture filtering
+// are from http://rastergrid.com/blog/2010/09/efficient-gaussian-blur-with-linear-sampling/
+uniform float offsets[3] = float[](0.0, 1.3846153846, 3.2307692308);
+uniform float weights[3] = float[](0.2270270270, 0.3162162162, 0.0702702703);
+uniform bool horzBlur;
+uniform vec2 texSize;
+
+void main()
+{
+	vec4 fragColor = texture2D(texture, fragTexCoord) * weights[0];
+	for (int i = 1; i < 3; i++) {
+		vec2 offset;
+		if (horzBlur) {
+			offset = vec2(offsets[i] / texSize.x, 0.0) ;
+		} else {
+			offset = vec2(0.0, offsets[i] / texSize.y);
+		}
+		fragColor += texture2D(texture, fragTexCoord+offset) * weights[i];
+		fragColor += texture2D(texture, fragTexCoord-offset) * weights[i];
+	}
+	gl_FragColor = vec4(fragColor.xyz, 1.0);
+}
