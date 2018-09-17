@@ -39,12 +39,13 @@ float getShadowMapCoordinate(int index, vec2 P)
 				sqrt(3.0)/2.0*P.x - 1.0/2.0*P.y);
 	}
 
-	return (P.x / (sqrt(3) * P.y) + 1) / 2.0;
+	return (P.x / (sqrt(3.0) * P.y) + 1.0) / 2.0;
 }
 
 float getFragmentDepth(vec2 fragPosLight)
 {
-	int index = int(mod(floor((atan(fragPosLight.y, fragPosLight.x)+7.0*PI/6.0)/(4.0*PI/6.0))+1.0, 3.0));
+	float angle = atan(fragPosLight.y, fragPosLight.x);
+	int index = int(mod(floor((angle + 11.0/6.0*PI)/(2.0/3.0*PI)), 3.0));
 	float xCoord = getShadowMapCoordinate(index, fragPosLight);
 	float depth = texture(depthMap, vec3(xCoord, 0.0, float(index))).r * farPlaneDist;
 	return depth;

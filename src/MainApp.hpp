@@ -21,6 +21,7 @@
 
 #include "Logic/LightManagerMap.hpp"
 #include "Logic/LightManagerVolume.hpp"
+#include "Utils/VideoWriter.hpp"
 
 using namespace std;
 using namespace sgl;
@@ -63,6 +64,9 @@ private:
 	int numProbes;
 	vector<vector<float>> benchmarkData;
 	vector<int> fps;
+
+	// Save video stream to file
+	VideoWriter *videoWriter;
 };
 
 #endif /* LOGIC_MainApp_HPP_ */

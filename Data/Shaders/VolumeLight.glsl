@@ -1,5 +1,6 @@
 -- Vertex
 
+//< The object's model matrix
 uniform mat4 mMatrix;
 
 in vec2 position;
@@ -12,6 +13,7 @@ void main()
 
 -- Geometry
 
+// Contour lines in world space
 layout(lines) in;
 layout(triangle_strip, max_vertices = 4) out;
 

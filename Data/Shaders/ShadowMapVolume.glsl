@@ -20,7 +20,6 @@ uniform vec2 lightpos;
 uniform mat4 camViewProjMatrices[3]; 
 
 out vec2 fragPos;
-out vec2 texcoord;
 
 void main()
 {
@@ -40,35 +39,6 @@ void main()
 			vec4 dirUp = vec4(0.0, 0.0, 1.0, 0.0);
 			vec4 dirDown = vec4(0.0, 0.0, -1.0, 0.0);
 			
-			/*fragPos = gl_in[0].gl_Position.xy;
-			gl_Position = vpMatrix * gl_in[0].gl_Position;
-			EmitVertex();
-			fragPos = gl_in[0].gl_Position.xy;
-			gl_Position = vpMatrix * (gl_in[0].gl_Position + vec4(0.0,0.0,100.0,0.0));
-			EmitVertex();
-			fragPos = gl_in[1].gl_Position.xy;
-			gl_Position = vpMatrix * gl_in[1].gl_Position;
-			EmitVertex();
-			fragPos = gl_in[1].gl_Position.xy;
-			gl_Position = vpMatrix * (gl_in[1].gl_Position + vec4(0.0,0.0,100.0,0.0));
-			EmitVertex();
-			EndPrimitive();
-			
-			fragPos = gl_in[0].gl_Position.xy;
-			gl_Position = vpMatrix * gl_in[0].gl_Position;
-			EmitVertex();
-			fragPos = gl_in[1].gl_Position.xy;
-			gl_Position = vpMatrix * gl_in[1].gl_Position;
-			EmitVertex();
-			fragPos = gl_in[0].gl_Position.xy;
-			gl_Position = vpMatrix * (gl_in[0].gl_Position - vec4(0.0,0.0,100.0,0.0));
-			EmitVertex();
-			fragPos = gl_in[1].gl_Position.xy;
-			gl_Position = vpMatrix * (gl_in[1].gl_Position - vec4(0.0,0.0,100.0,0.0));
-			EmitVertex();
-			EndPrimitive();*/
-
-
 			fragPos = gl_in[0].gl_Position.xy;
 			gl_Position = vpMatrix * gl_in[0].gl_Position;
 			EmitVertex();
@@ -77,9 +47,6 @@ void main()
 			EmitVertex();
 			fragPos = gl_in[1].gl_Position.xy;
 			gl_Position = vpMatrix * gl_in[1].gl_Position;
-			EmitVertex();
-			fragPos = gl_in[1].gl_Position.xy;
-			gl_Position = vpMatrix * dirUp;
 			EmitVertex();
 			EndPrimitive();
 			
@@ -91,9 +58,6 @@ void main()
 			EmitVertex();
 			fragPos = gl_in[0].gl_Position.xy;
 			gl_Position = vpMatrix * gl_in[0].gl_Position;
-			EmitVertex();
-			fragPos = gl_in[0].gl_Position.xy;
-			gl_Position = vpMatrix * dirDown;
 			EmitVertex();
 			EndPrimitive();
 		}
@@ -105,7 +69,6 @@ void main()
 
 in vec2 fragPos;
 in float currLayer;
-in vec2 texcoord;
 
 uniform vec2 lightpos;
 uniform float farPlaneDist;

@@ -26,7 +26,7 @@
 #include <glm/gtx/color_space.hpp>
 #include "MainApp.hpp"
 
-VolumeLightApp::VolumeLightApp() : camera(new Camera()), random(10203)
+VolumeLightApp::VolumeLightApp() : camera(new Camera()), random(10203), videoWriter(NULL)
 {
 	plainShader = ShaderManager->getShaderProgram({"Mesh.Vertex.Plain", "Mesh.Fragment.Plain"});
 	whiteSolidShader = ShaderManager->getShaderProgram({"WhiteSolid.Vertex", "WhiteSolid.Fragment"});
@@ -44,7 +44,7 @@ VolumeLightApp::VolumeLightApp() : camera(new Camera()), random(10203)
 	lightManagerType = 0;
 	edgeShader = lightManager->getEdgeShader();
 	//VolumeLightPtr light = lightManager->addLight(glm::vec2(0.5,0.5));
-	VolumeLightPtr light = lightManager->addLight(glm::vec2(0.0,0.0));
+	VolumeLightPtr light = lightManager->addLight(glm::vec2(0.5,0.5));
 
 	// Add objects to scene
 	// A
@@ -76,9 +76,10 @@ VolumeLightApp::VolumeLightApp() : camera(new Camera()), random(10203)
 	grabPointRenderData->addGeometryBuffer(geometryBuffer, "position", ATTRIB_FLOAT, 2);
 	grabPointRenderData->setVertexMode(VERTEX_MODE_TRIANGLE_FAN);
 
+	resolutionChanged(EventPtr());
 
 	// Benchmark mode
-	benchmark = true;
+	benchmark = false;
 	benchmarkFinished = false;
 	maxLights = 101;
 	numProbes = 10;
@@ -122,6 +123,10 @@ VolumeLightApp::~VolumeLightApp()
 	}
 
 	lightManager = boost::shared_ptr<LightManagerInterface>();
+
+	if (videoWriter != NULL) {
+		delete videoWriter;
+	}
 }
 
 void VolumeLightApp::renderScene()
@@ -149,6 +154,10 @@ void VolumeLightApp::renderEdges()
 void VolumeLightApp::render()
 {
 	bool wireframe = false;
+
+	if (videoWriter == NULL) {
+		//videoWriter = new VideoWriter("video.mp4");
+	}
 
 	Renderer->setCamera(camera);
 
@@ -184,6 +193,7 @@ void VolumeLightApp::render()
 		Renderer->disableWireframeMode();
 	}
 
+	//videoWriter->pushWindowFrame();
 }
 
 void VolumeLightApp::resolutionChanged(EventPtr event)

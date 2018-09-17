@@ -114,7 +114,7 @@ void LightManagerMap::onResolutionChanged()
 	lightTarget->bindFramebufferObject(lightFBO);
 
 	// Create shadow map
-	shadowMapWidth = 1024;//window->getWidth(); // TODO
+	shadowMapWidth = 2048;//window->getWidth(); // TODO
 	TextureGL *texGL = new TextureGL(createShadowmapTex(shadowMapWidth), shadowMapWidth, 1, 16,
 			GL_LINEAR, GL_LINEAR, GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE);
 	shadowmap = TexturePtr(texGL);
@@ -165,7 +165,6 @@ void LightManagerMap::renderLightmap(function<void()> renderfun) {
 		for (int i = 0; i < 3; ++i) {
 			shadowmapShader->setUniform(matUniformLoc+i, lightcamProj[i]*lightcamView[i]*matrixTranslation(-light->getPosition()));
 		}
-		glm::vec4 testpt = lightcamProj[0]*lightcamView[0]*glm::vec4(0.0f, 2.0f, 0.0f, 1.0f);
 		glDepthMask(GL_TRUE);
 		glEnable(GL_DEPTH_TEST);
 		glDepthFunc(GL_LESS);
