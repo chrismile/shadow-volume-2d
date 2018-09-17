@@ -1,5 +1,7 @@
 -- Vertex
 
+#version 430 core
+
 in vec4 position;
 in float radius;
 
@@ -15,6 +17,8 @@ void main()
 
 
 -- Geometry
+
+#version 430 core
 
 layout(points) in;
 layout(triangle_strip, max_vertices = 4) out;
@@ -56,6 +60,8 @@ void main()
 
 
 -- Fragment
+
+#version 430 core
 
 uniform vec4 color;
 uniform vec2 resolution;

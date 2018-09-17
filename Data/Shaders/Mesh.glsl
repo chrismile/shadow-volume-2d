@@ -1,7 +1,8 @@
 -- Vertex.Plain
 
-uniform mat4 mvpMatrix;
-attribute vec4 position;
+#version 430 core
+
+in vec4 position;
 
 void main()
 {
@@ -9,6 +10,8 @@ void main()
 }
 
 -- Fragment.Plain
+
+#version 430 core
 
 uniform vec4 color;
 
@@ -21,10 +24,11 @@ void main()
 
 -- Vertex.Textured
 
-uniform mat4 mvpMatrix;
-attribute vec4 position;
-attribute vec2 texcoord;
-varying vec2 fragTexCoord;
+#version 430 core
+
+in vec4 position;
+in vec2 texcoord;
+out vec2 fragTexCoord;
 
 void main()
 {
@@ -36,7 +40,7 @@ void main()
 
 uniform sampler2D texture;
 uniform vec4 color;
-varying vec2 fragTexCoord;
+in vec2 fragTexCoord;
 
 void main()
 {

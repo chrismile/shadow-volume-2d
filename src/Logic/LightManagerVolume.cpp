@@ -24,7 +24,7 @@ LightManagerVolume::LightManagerVolume(CameraPtr _camera)
 	multisampling = false;
 	lightCombineShader = ShaderManager->getShaderProgram({"LightMix.Vertex", "LightMix.Fragment"});
 	lightCombineShader->setUniform("ambientLight", Color(50, 50, 50));
-	edgeShader = ShaderManager->getShaderProgram({"VolumeLight.Vertex.Plain.GL3", "VolumeLight.Geometry.Plain.GL3", "VolumeLight.Fragment.Plain.GL3"});
+	edgeShader = ShaderManager->getShaderProgram({"VolumeLight.Vertex", "VolumeLight.Geometry", "VolumeLight.Fragment"});
 	onResolutionChanged();
 }
 

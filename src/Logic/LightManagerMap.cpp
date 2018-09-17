@@ -60,10 +60,10 @@ LightManagerMap::LightManagerMap(CameraPtr _camera)
 	multisampling = false;
 	lightCombineShader = ShaderManager->getShaderProgram({"LightMix.Vertex", "LightMix.Fragment"});
 	lightCombineShader->setUniform("ambientLight", Color(50, 50, 50));
-	shadowmapShader = ShaderManager->getShaderProgram({"ShadowMapVolume.Vertex.Plain.GL3",
-			"ShadowMapVolume.Geometry.Plain.GL3", "ShadowMapVolume.Fragment.Plain.GL3"});
-	shadowMapRenderShader = ShaderManager->getShaderProgram({"ShadowMapRender.Vertex.Plain.GL3",
-		"ShadowMapRender.Fragment.Plain.GL3"});
+	shadowmapShader = ShaderManager->getShaderProgram({"ShadowMapVolume.Vertex",
+			"ShadowMapVolume.Geometry", "ShadowMapVolume.Fragment"});
+	shadowMapRenderShader = ShaderManager->getShaderProgram({"ShadowMapRender.Vertex",
+		"ShadowMapRender.Fragment"});
 	onResolutionChanged();
 
 	// The three light cams look in three directions with 120° angles inbetween

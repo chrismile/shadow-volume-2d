@@ -5,7 +5,7 @@
 *.slo
 *.lo
 *.o
-*.obj
+#*.obj Commented out, as project uses .obj model files
 
 # Precompiled Headers
 *.gch
@@ -56,4 +56,15 @@ docs/latex/*
 
 /Debug/
 /build/*
+Data/Models/Ship*
+
+# CLion
+.idea/*
+cmake-build-*/
+
+# Custom for models
+*.blend
+*.mtl
+*.obj
+*.binmesh
 *.mp4

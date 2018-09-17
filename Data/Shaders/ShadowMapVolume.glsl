@@ -1,6 +1,6 @@
 -- Vertex
 
-uniform mat4 mMatrix;
+#version 430 core
 
 in vec2 position;
 
@@ -11,6 +11,8 @@ void main()
 
 
 -- Geometry
+
+#version 430 core
 
 layout(lines) in;
 // vertices: 4 * 2 * 3 = quad * (up+down) * cameras
@@ -66,6 +68,8 @@ void main()
 
 
 -- Fragment
+
+#version 430 core
 
 in vec2 fragPos;
 in float currLayer;

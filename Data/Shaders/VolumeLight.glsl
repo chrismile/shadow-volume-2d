@@ -1,7 +1,6 @@
 -- Vertex
 
-//< The object's model matrix
-uniform mat4 mMatrix;
+#version 430 core
 
 in vec2 position;
 
@@ -13,12 +12,12 @@ void main()
 
 -- Geometry
 
+#version 430 core
+
 // Contour lines in world space
 layout(lines) in;
 layout(triangle_strip, max_vertices = 4) out;
 
-uniform mat4 vMatrix;
-uniform mat4 pMatrix;
 uniform vec2 lightpos;
 
 void main()
@@ -53,6 +52,8 @@ void main()
 
 
 -- Fragment
+
+#version 430 core
 
 void main()
 {

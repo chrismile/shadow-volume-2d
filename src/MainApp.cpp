@@ -85,7 +85,7 @@ VolumeLightApp::VolumeLightApp() : camera(new Camera()), random(10203), videoWri
 	numProbes = 10;
 	//Timer->disableFixedFPS();
 	if (benchmark) {
-		benchmarkTimer = Timer->getTimeInS();
+		benchmarkTimer = Timer->getTimeInSeconds();
 
 		// Start with no light
 		lightManager->getLights().clear();
@@ -230,8 +230,8 @@ void VolumeLightApp::update(float dt)
 		int numLights = lightManager->getLights().size();
 
 		// Add new FPS snapshot to buffer every 50ms
-		if (fabs(benchmarkTimer - Timer->getTimeInS()) > 0.05f) {
-			benchmarkTimer = Timer->getTimeInS();
+		if (fabs(benchmarkTimer - Timer->getTimeInSeconds()) > 0.05f) {
+			benchmarkTimer = Timer->getTimeInSeconds();
 			benchmarkData.at(numLights).push_back(getFPS());
 
 		}

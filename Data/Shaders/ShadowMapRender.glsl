@@ -1,7 +1,6 @@
 -- Vertex
 
-uniform mat4 mMatrix;
-uniform mat4 mvpMatrix;
+#version 430 core
 
 in vec2 position;
 out vec2 fragPosWorld;
@@ -14,6 +13,8 @@ void main()
 
 
 -- Fragment
+
+#version 430 core
 
 uniform sampler2DArray depthMap;
 uniform vec2 lightpos;

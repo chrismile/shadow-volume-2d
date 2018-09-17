@@ -1,5 +1,7 @@
 -- Vertex
 
+#version 430 core
+
 /* This shader file was adopted from the jMonkeyEngine, which is released under the following license:
 
 Copyright (c) 2003-2012 jMonkeyEngine
@@ -37,10 +39,10 @@ uniform vec2 g_Resolution;
 
 uniform float m_SubPixelShift;
 
-attribute vec2 texcoord;
-attribute vec4 position;
-varying vec2 texCoord;
-varying vec4 posPos;
+in vec2 texcoord;
+in vec4 position;
+out vec2 texCoord;
+out vec4 posPos;
 
 void main() {
     gl_Position = position; //vec4(pos, 0.0, 1.0);
@@ -51,6 +53,8 @@ void main() {
 }
 
 -- Fragment
+
+#version 430 core
 
 /* This shader file was adopted from the jMonkeyEngine, which is released under the following license:
 
@@ -94,8 +98,8 @@ uniform float m_VxOffset;
 uniform float m_SpanMax;
 uniform float m_ReduceMul;
 
-varying vec2 texCoord;
-varying vec4 posPos;
+in vec2 texCoord;
+in vec4 posPos;
 
 #define FxaaTex(t, p) texture2D(t, p)
 

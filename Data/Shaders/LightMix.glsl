@@ -1,8 +1,10 @@
 -- Vertex
 
-attribute vec2 position;
-attribute vec2 texcoord;
-varying vec2 st;
+#version 430 core
+
+in vec2 position;
+in vec2 texcoord;
+out vec2 st;
 
 void main()
 {
@@ -12,10 +14,12 @@ void main()
 
 -- Fragment
 
+#version 430 core
+
 uniform sampler2D texture; // Scene
 uniform sampler2D lightTexture;
 uniform vec4 ambientLight;
-varying vec2 st;
+in vec2 st;
 
 void main()
 {
