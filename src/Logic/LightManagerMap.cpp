@@ -165,6 +165,14 @@ void LightManagerMap::renderLightmap(function<void()> renderfun) {
 		for (int i = 0; i < 3; ++i) {
 			shadowmapShader->setUniform(matUniformLoc+i, lightcamProj[i]*lightcamView[i]*matrixTranslation(-light->getPosition()));
 		}
+		/*shadowmapShader->bind();
+		glm::mat4 matrices[3];
+		for (int i = 0; i < 3; ++i) {
+			matrices[i] = lightcamProj[i]*lightcamView[i]*matrixTranslation(-light->getPosition());
+			//shadowmapShader->setUniform(matUniformLoc+i, lightcamProj[i]*lightcamView[i]*matrixTranslation(-light->getPosition()));
+		}
+		glUniformMatrix4fv(matUniformLoc, 3, false, (float*)&matrices);*/
+		
 		glDepthMask(GL_TRUE);
 		glEnable(GL_DEPTH_TEST);
 		glDepthFunc(GL_LESS);

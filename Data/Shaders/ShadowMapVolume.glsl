@@ -15,8 +15,8 @@ void main()
 #version 430 core
 
 layout(lines) in;
-// vertices: 4 * 2 * 3 = quad * (up+down) * cameras
-layout(triangle_strip, max_vertices = 24) out;
+// vertices: 4 * 3 = quad * cameras
+layout(triangle_strip, max_vertices = 12) out;
 
 uniform vec2 lightpos;
 uniform mat4 camViewProjMatrices[3]; 
@@ -40,8 +40,12 @@ void main()
 			
 			vec4 dirUp = vec4(0.0, 0.0, 1.0, 0.0);
 			vec4 dirDown = vec4(0.0, 0.0, -1.0, 0.0);
-			
-			fragPos = gl_in[0].gl_Position.xy;
+
+
+			/**
+			 * Oddly, this code only works on the Intel Mesa3D driver.
+			 */
+			/*fragPos = gl_in[0].gl_Position.xy;
 			gl_Position = vpMatrix * gl_in[0].gl_Position;
 			EmitVertex();
 			fragPos = gl_in[0].gl_Position.xy;
@@ -60,6 +64,22 @@ void main()
 			EmitVertex();
 			fragPos = gl_in[0].gl_Position.xy;
 			gl_Position = vpMatrix * gl_in[0].gl_Position;
+			EmitVertex();
+			EndPrimitive();*/
+
+
+            // Works on NVIDIA & Intel GPUs
+			fragPos = gl_in[0].gl_Position.xy;
+			gl_Position = vpMatrix * (gl_in[0].gl_Position + dirUp);
+			EmitVertex();
+			fragPos = gl_in[1].gl_Position.xy;
+			gl_Position = vpMatrix * (gl_in[1].gl_Position + dirUp);
+			EmitVertex();
+			fragPos = gl_in[0].gl_Position.xy;
+			gl_Position = vpMatrix * (gl_in[0].gl_Position + dirDown);
+			EmitVertex();
+			fragPos = gl_in[1].gl_Position.xy;
+			gl_Position = vpMatrix * (gl_in[1].gl_Position + dirDown);
 			EmitVertex();
 			EndPrimitive();
 		}
