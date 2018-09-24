@@ -23,6 +23,7 @@ public:
 	void renderLightmap(function<void()> renderfun);
 	void endRenderLightmap();
 	void blitMixSceneAndLights();
+	void renderGUI();
 
 	VolumeLightPtr addLight(const glm::vec2 &pos, float rad = 10.0f, const Color &col = Color(255, 255, 255));
 	vector<VolumeLightPtr> &getLights() { return lights; }
@@ -37,13 +38,10 @@ private:
 	ShaderProgramPtr shadowmapShader;
 	ShaderProgramPtr shadowMapRenderShader;
 	ShaderProgramPtr lightCombineShader;
-	bool multisampling;
 
 	ShaderAttributesPtr shadowmapRenderAttributes;
 	glm::mat4 lightcamProj[3];
 	glm::mat4 lightcamView[3];
-
-	int shadowMapWidth;
 
 	RenderTargetPtr sceneTarget;
 	FramebufferObjectPtr sceneFBO;

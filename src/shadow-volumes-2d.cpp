@@ -21,6 +21,7 @@ int main(int argc, char *argv[]) {
 	// Load the file containing the app settings
 	string settingsFile = FileUtils::get()->getConfigDirectory() + "settings.txt";
 	AppSettings::get()->loadSettings(settingsFile.c_str());
+	AppSettings::get()->setLoadGUI();
 
 	Window *window = AppSettings::get()->createWindow();
 	AppSettings::get()->initializeSubsystems();

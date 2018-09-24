@@ -5,6 +5,9 @@
  *      Author: Christoph Neuhauser
  */
 
+#include <climits>
+#include <GL/glew.h>
+
 #include <Input/Keyboard.hpp>
 #include <Math/Math.hpp>
 #include <Graphics/Window.hpp>
@@ -19,12 +22,17 @@
 #include <Utils/File/FileUtils.hpp>
 #include <Graphics/Renderer.hpp>
 #include <Graphics/Shader/ShaderManager.hpp>
-#include <GL/glew.h>
-#include <climits>
+#include <ImGui/ImGuiWrapper.hpp>
+
 #include "Logic/Circle.hpp"
 #include "Logic/Arc.hpp"
-#include <glm/gtx/color_space.hpp>
 #include "MainApp.hpp"
+#include <glm/gtx/color_space.hpp>
+
+void openglErrorCallback()
+{
+	std::cerr << "Application callback" << std::endl;
+}
 
 VolumeLightApp::VolumeLightApp() : camera(new Camera()), random(10203), videoWriter(NULL)
 {
@@ -39,6 +47,9 @@ VolumeLightApp::VolumeLightApp() : camera(new Camera()), random(10203), videoWri
 	float fovy = atanf(1.0f / 2.0f) * 2.0f;
 	camera->setFOVy(fovy);
 	camera->setPosition(glm::vec3(-0.5f, -0.5f, -1.0f));
+
+	Renderer->setErrorCallback(&openglErrorCallback);
+	Renderer->setDebugVerbosity(DEBUG_OUTPUT_CRITICAL_ONLY);
 
 	lightManager = boost::shared_ptr<LightManagerInterface>(new LightManagerMap(camera)); // LightManagerMap
 	lightManagerType = 0;
@@ -193,7 +204,50 @@ void VolumeLightApp::render()
 		Renderer->disableWireframeMode();
 	}
 
+	renderGUI();
+
 	//videoWriter->pushWindowFrame();
+}
+
+void VolumeLightApp::renderGUI()
+{
+	ImGuiWrapper::get()->renderStart();
+	//ImGuiWrapper::get()->renderDemoWindow();
+
+	if (showSettingsWindow) {
+		ImGui::Begin("Settings", &showSettingsWindow);
+
+		bool changeMode = false;
+		static int mode = 0;
+		changeMode |= ImGui::RadioButton("Shadow Maps", &lightManagerType, 0); ImGui::SameLine();
+		changeMode |= ImGui::RadioButton("Shadow Volumes", &lightManagerType, 1);
+		if (changeMode) {
+			auto lights = lightManager->getLights();
+			if (lightManagerType == 0) {
+				lightManager = boost::shared_ptr<LightManagerInterface>(new LightManagerMap(camera));
+			} else {
+				lightManager = boost::shared_ptr<LightManagerInterface>(new LightManagerVolume(camera));
+			}
+			edgeShader = lightManager->getEdgeShader();
+			for (PrimitivePtr &primitive : primitives) {
+				primitive->setEdgeShader(edgeShader);
+			}
+			for (VolumeLightPtr &light : lights) {
+				lightManager->addLight(light->getPosition(), light->getRadius(), light->getColor());
+			}
+		}
+
+		lightManager->renderGUI();
+
+		ImGui::End();
+	}
+
+	ImGuiWrapper::get()->renderEnd();
+}
+
+void VolumeLightApp::processSDLEvent(const SDL_Event &event)
+{
+	ImGuiWrapper::get()->processSDLEvent(event);
 }
 
 void VolumeLightApp::resolutionChanged(EventPtr event)
@@ -206,25 +260,7 @@ void VolumeLightApp::resolutionChanged(EventPtr event)
 void VolumeLightApp::update(float dt)
 {
 	AppLogic::update(dt);
-	glm::vec2 mousepos = camera->mousePositionInPlane(0.0f);
 
-	if (Keyboard->keyPressed(SDLK_RETURN)) {
-		auto lights = lightManager->getLights();
-		if (lightManagerType == 0) {
-			lightManagerType = 1;
-			lightManager = boost::shared_ptr<LightManagerInterface>(new LightManagerVolume(camera));
-		} else {
-			lightManagerType = 0;
-			lightManager = boost::shared_ptr<LightManagerInterface>(new LightManagerMap(camera));
-		}
-		edgeShader = lightManager->getEdgeShader();
-		for (PrimitivePtr &primitive : primitives) {
-			primitive->setEdgeShader(edgeShader);
-		}
-		for (VolumeLightPtr &light : lights) {
-			lightManager->addLight(light->getPosition(), light->getRadius(), light->getColor());
-		}
-	}
 
 	if (benchmark) {
 		int numLights = lightManager->getLights().size();
@@ -251,6 +287,39 @@ void VolumeLightApp::update(float dt)
 		}
 	}
 
+
+
+	ImGuiIO &io = ImGui::GetIO();
+	if (io.WantCaptureKeyboard) {
+		// Ignore inputs below
+		return;
+	}
+
+	glm::vec2 mousepos = camera->mousePositionInPlane(0.0f);
+
+	if (Keyboard->keyPressed(SDLK_RETURN)) {
+		auto lights = lightManager->getLights();
+		if (lightManagerType == 0) {
+			lightManagerType = 1;
+			lightManager = boost::shared_ptr<LightManagerInterface>(new LightManagerVolume(camera));
+		} else {
+			lightManagerType = 0;
+			lightManager = boost::shared_ptr<LightManagerInterface>(new LightManagerMap(camera));
+		}
+		edgeShader = lightManager->getEdgeShader();
+		for (PrimitivePtr &primitive : primitives) {
+			primitive->setEdgeShader(edgeShader);
+		}
+		for (VolumeLightPtr &light : lights) {
+			lightManager->addLight(light->getPosition(), light->getRadius(), light->getColor());
+		}
+	}
+
+
+	if (io.WantCaptureMouse) {
+		// Ignore inputs below
+		return;
+	}
 
 	// --- Start of user interaction ---
 	// Right mouse button: Remove light

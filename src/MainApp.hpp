@@ -35,6 +35,8 @@ public:
 	VolumeLightApp();
 	~VolumeLightApp();
 	void render();
+	void renderGUI();
+	void processSDLEvent(const SDL_Event &event);
 	void renderScene(); // Renders lighted scene
 	void renderEdges(); // Renders edge lines of scene that get extruded by the geometry of "edgeShader"
 	void update(float dt);
@@ -55,6 +57,9 @@ private:
 	float grabPointRadius;
 	VolumeLightPtr grabbedLight;
 	XorshiftRandomGenerator random;
+
+	// GUI
+	bool showSettingsWindow = true;
 
 	// Benchmarking performance
 	bool benchmark;

@@ -7,6 +7,7 @@
 
 #include <vector>
 #include <GL/glew.h>
+
 #include <Graphics/Renderer.hpp>
 #include <Graphics/Shader/ShaderManager.hpp>
 #include <Graphics/Texture/TextureManager.hpp>
@@ -18,9 +19,12 @@
 #include <Graphics/OpenGL/Texture.hpp>
 #include <Graphics/Mesh/Vertex.hpp>
 #include <Graphics/Shader/ShaderAttributes.hpp>
+#include <ImGui/ImGuiWrapper.hpp>
+
 #include "LightManagerMap.hpp"
 
 const float LIGHT_FAR_PLANE_DIST = 10.0f;
+static int depthFormat = GL_DEPTH_COMPONENT16;
 
 GLuint createShadowmapTex(int res) {
 	GLuint texture = 0;
@@ -30,7 +34,7 @@ GLuint createShadowmapTex(int res) {
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexStorage3D(GL_TEXTURE_2D_ARRAY, 1, GL_DEPTH_COMPONENT16, res, 1, 3);
+	glTexStorage3D(GL_TEXTURE_2D_ARRAY, 1, depthFormat, res, 1, 3);
 	return texture;
 }
 
@@ -57,7 +61,6 @@ LightManagerMap::LightManagerMap(CameraPtr _camera)
 	sceneTarget = RenderTargetPtr(new RenderTarget());
 	lightTarget = RenderTargetPtr(new RenderTarget());
 	shadowmapTarget = RenderTargetPtr(new RenderTarget());
-	multisampling = false;
 	lightCombineShader = ShaderManager->getShaderProgram({"LightMix.Vertex", "LightMix.Fragment"});
 	lightCombineShader->setUniform("ambientLight", Color(50, 50, 50));
 	shadowmapShader = ShaderManager->getShaderProgram({"ShadowMapVolume.Vertex",
@@ -80,6 +83,38 @@ LightManagerMap::LightManagerMap(CameraPtr _camera)
 	shadowMapRenderShader->setUniform("farPlaneDist", LIGHT_FAR_PLANE_DIST);
 }
 
+
+static int shadowMapWidth = 2048;
+static bool multisampling = false;
+static int depthFormatIndex = 0;
+
+void LightManagerMap::renderGUI()
+{
+    ImGui::Separator();
+
+    ImGui::Text("Shadow Map Resolution:");
+	if (ImGui::SliderInt("pixels", &shadowMapWidth, 16, 4096)) {
+		onResolutionChanged();
+	}
+
+	if (ImGui::Checkbox("Multisampling", &multisampling)) {
+		onResolutionChanged();
+	}
+
+	const char *depthFormatNames[] = {"UNORM 16-bit", "UNORM 24-bit", "UNORM 32-bit", "Float 32-bit"};
+	if (ImGui::Combo("OIT Mode", (int*)&depthFormatIndex, depthFormatNames, IM_ARRAYSIZE(depthFormatNames))) {
+		if (depthFormatIndex == 0) {
+			depthFormat = GL_DEPTH_COMPONENT16;
+		} else if (depthFormatIndex == 1) {
+			depthFormat = GL_DEPTH_COMPONENT24;
+		} else if (depthFormatIndex == 2) {
+			depthFormat = GL_DEPTH_COMPONENT32;
+		} else if (depthFormatIndex == 3) {
+			depthFormat = GL_DEPTH_COMPONENT32F;
+		}
+		onResolutionChanged();
+	}
+}
 
 
 
@@ -114,11 +149,12 @@ void LightManagerMap::onResolutionChanged()
 	lightTarget->bindFramebufferObject(lightFBO);
 
 	// Create shadow map
-	shadowMapWidth = 2048;//window->getWidth(); // TODO
-	TextureGL *texGL = new TextureGL(createShadowmapTex(shadowMapWidth), shadowMapWidth, 1, 16,
-			GL_LINEAR, GL_LINEAR, GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE);
+    TextureSettings settings(TEXTURE_2D_ARRAY, GL_LINEAR, GL_LINEAR, GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE);
+    settings.internalFormat = depthFormat;
+    settings.pixelFormat = GL_RED;
+    settings.pixelType = GL_FLOAT;
+	TextureGL *texGL = new TextureGL(createShadowmapTex(shadowMapWidth), shadowMapWidth, 1, 16, settings);
 	shadowmap = TexturePtr(texGL);
-	texGL->setTextureType(TEXTURE_3D);
 	shadowmapFBO = Renderer->createFBO();
 	shadowmapFBO->bindTexture(shadowmap, DEPTH_ATTACHMENT);
 	shadowmapTarget->bindFramebufferObject(shadowmapFBO);
@@ -172,7 +208,7 @@ void LightManagerMap::renderLightmap(function<void()> renderfun) {
 			//shadowmapShader->setUniform(matUniformLoc+i, lightcamProj[i]*lightcamView[i]*matrixTranslation(-light->getPosition()));
 		}
 		glUniformMatrix4fv(matUniformLoc, 3, false, (float*)&matrices);*/
-		
+
 		glDepthMask(GL_TRUE);
 		glEnable(GL_DEPTH_TEST);
 		glDepthFunc(GL_LESS);

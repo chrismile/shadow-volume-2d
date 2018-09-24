@@ -52,7 +52,7 @@ float getFragmentDepth(vec2 fragPosLight)
 	return depth;
 }
 
-const float BIAS = 0.0005;
+const float BIAS = 0.002;
 
 void main()
 {

@@ -6,6 +6,7 @@
  */
 
 #include <GL/glew.h>
+
 #include <Graphics/Renderer.hpp>
 #include <Graphics/Shader/ShaderManager.hpp>
 #include <Graphics/Texture/TextureManager.hpp>
@@ -13,6 +14,8 @@
 #include <Utils/AppSettings.hpp>
 #include <Input/Keyboard.hpp>
 #include <Math/Geometry/MatrixUtil.hpp>
+#include <ImGui/ImGuiWrapper.hpp>
+
 #include "LightManagerVolume.hpp"
 
 LightManagerVolume::LightManagerVolume(CameraPtr _camera)
@@ -21,12 +24,23 @@ LightManagerVolume::LightManagerVolume(CameraPtr _camera)
 	sceneTarget = RenderTargetPtr(new RenderTarget());
 	lightTarget = RenderTargetPtr(new RenderTarget());
 	lightTempTarget = RenderTargetPtr(new RenderTarget());
-	multisampling = false;
 	lightCombineShader = ShaderManager->getShaderProgram({"LightMix.Vertex", "LightMix.Fragment"});
 	lightCombineShader->setUniform("ambientLight", Color(50, 50, 50));
 	edgeShader = ShaderManager->getShaderProgram({"VolumeLight.Vertex", "VolumeLight.Geometry", "VolumeLight.Fragment"});
 	onResolutionChanged();
 }
+
+static bool multisampling = false;
+
+void LightManagerVolume::renderGUI()
+{
+	ImGui::Separator();
+
+	if (ImGui::Checkbox("Multisampling", &multisampling)) {
+		onResolutionChanged();
+	}
+}
+
 
 VolumeLightPtr LightManagerVolume::addLight(const glm::vec2 &pos, float rad, const Color &col)
 {

@@ -20,6 +20,8 @@ layout(triangle_strip, max_vertices = 4) out;
 
 uniform vec2 lightpos;
 
+const float bias = 0.002;
+
 void main()
 {
 	vec2 pt0 = gl_in[0].gl_Position.xy;
@@ -34,13 +36,13 @@ void main()
 		vec4 dir0 = vec4(pt0 - lightpos,0.,0.);
 		vec4 dir1 = vec4(pt1 - lightpos,0.,0.);
 		
-		gl_Position = vpMatrix * gl_in[0].gl_Position;
+		gl_Position = vpMatrix * gl_in[0].gl_Position - bias * normalize(vec4(pt0 - lightpos, 0.0, 0.0));
 		EmitVertex();
 
 		gl_Position = vpMatrix * dir0;
 		EmitVertex();
 		
-		gl_Position = vpMatrix * gl_in[1].gl_Position;
+		gl_Position = vpMatrix * gl_in[1].gl_Position - bias * normalize(vec4(pt1 - lightpos, 0.0, 0.0));
 		EmitVertex();
 
 		gl_Position = vpMatrix * dir1;
