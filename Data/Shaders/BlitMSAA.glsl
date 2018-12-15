@@ -19,6 +19,7 @@ void main()
 uniform sampler2D texture;
 uniform int numSamples;
 in vec2 fragTexCoord;
+out vec4 fragColor;
 
 void main()
 {
@@ -28,5 +29,5 @@ void main()
 	for (int currSample = 0; currSample < numSamples; currSample++) {
 		color += texelFetch(texture, iCoords, currSample).rgb;
 	}
-	gl_FragColor = vec4(color / numSamples, 1);
+	fragColor = vec4(color / numSamples, 1);
 }

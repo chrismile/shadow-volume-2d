@@ -18,6 +18,7 @@ void main()
 
 uniform sampler2D texture;
 in vec2 fragTexCoord;
+out vec4 fragColor;
 
 // Values for perfect weights and offset that utilize bilinear texture filtering
 // are from http://rastergrid.com/blog/2010/09/efficient-gaussian-blur-with-linear-sampling/
@@ -39,5 +40,5 @@ void main()
 		fragColor += texture2D(texture, fragTexCoord+offset) * weights[i];
 		fragColor += texture2D(texture, fragTexCoord-offset) * weights[i];
 	}
-	gl_FragColor = vec4(fragColor.xyz, 1.0);
+	fragColor = vec4(fragColor.xyz, 1.0);
 }

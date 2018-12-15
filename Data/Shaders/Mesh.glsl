@@ -14,10 +14,11 @@ void main()
 #version 430 core
 
 uniform vec4 color;
+out vec4 fragColor;
 
 void main()
 {
-	gl_FragColor = color;
+	fragColor = color;
 }
 
 
@@ -41,6 +42,7 @@ void main()
 uniform sampler2D texture;
 uniform vec4 color;
 in vec2 fragTexCoord;
+out vec4 fragColor;
 
 void main()
 {

@@ -70,6 +70,7 @@ in PixelData {
 	vec2 uv;
 	float radius;
 } PixelIn;
+out vec4 fragColor;
 
 void main()
 {
@@ -77,5 +78,5 @@ void main()
 	
 	float distance = distance(PixelIn.uv, vec2(0.5,0.5));
 	float value = 1.-smoothstep(0.5-delta, 0.5+delta, distance);	
-	gl_FragColor = vec4(color.rgb, value*color.a);
+	fragColor = vec4(color.rgb, value*color.a);
 }

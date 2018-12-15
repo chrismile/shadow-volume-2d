@@ -57,7 +57,9 @@ void main()
 
 #version 430 core
 
+out vec4 fragColor;
+
 void main()
 {
-	gl_FragColor = vec4(1., 1., 1., 1.);
+	fragColor = vec4(1., 1., 1., 1.);
 }

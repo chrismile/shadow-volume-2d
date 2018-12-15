@@ -89,8 +89,6 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#extension GL_EXT_gpu_shader4 : enable
-
 uniform sampler2D texture;
 uniform vec2 g_Resolution;
 
@@ -100,6 +98,7 @@ uniform float m_ReduceMul;
 
 in vec2 texCoord;
 in vec4 posPos;
+out vec4 fragColor;
 
 #define FxaaTex(t, p) texture2D(t, p)
 
@@ -175,5 +174,5 @@ vec3 FxaaPixelShader(
 void main()
 {
     vec2 rcpFrame = vec2(1.0) / g_Resolution;
-    gl_FragColor = vec4(FxaaPixelShader(posPos, texture, rcpFrame), 1.0);
+    fragColor = vec4(FxaaPixelShader(posPos, texture, rcpFrame), 1.0);
 }

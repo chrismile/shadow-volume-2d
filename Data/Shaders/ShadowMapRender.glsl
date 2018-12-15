@@ -21,6 +21,7 @@ uniform vec2 lightpos;
 uniform vec4 lightColor;
 uniform float farPlaneDist;
 in vec2 fragPosWorld;
+out vec4 fragColor;
 
 #define PI 3.1415926535897
 
@@ -62,7 +63,7 @@ void main()
 	if (fragDist > occlusionDepth - BIAS) {
 		color = vec4(0.0, 0.0, 0.0, 1.0);
 	}
-	gl_FragColor = color;
+	fragColor = color;
 }
 
 
