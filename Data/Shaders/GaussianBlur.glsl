@@ -29,7 +29,7 @@ uniform vec2 texSize;
 
 void main()
 {
-	vec4 fragColor = texture2D(texture, fragTexCoord) * weights[0];
+	vec4 fragColorBlur = texture2D(texture, fragTexCoord) * weights[0];
 	for (int i = 1; i < 3; i++) {
 		vec2 offset;
 		if (horzBlur) {
@@ -37,8 +37,8 @@ void main()
 		} else {
 			offset = vec2(0.0, offsets[i] / texSize.y);
 		}
-		fragColor += texture2D(texture, fragTexCoord+offset) * weights[i];
-		fragColor += texture2D(texture, fragTexCoord-offset) * weights[i];
+		fragColorBlur += texture2D(texture, fragTexCoord+offset) * weights[i];
+		fragColorBlur += texture2D(texture, fragTexCoord-offset) * weights[i];
 	}
-	fragColor = vec4(fragColor.xyz, 1.0);
+	fragColor = vec4(fragColorBlur.xyz, 1.0);
 }
