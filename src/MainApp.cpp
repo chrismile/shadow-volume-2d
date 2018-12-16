@@ -43,10 +43,12 @@ VolumeLightApp::VolumeLightApp() : camera(new Camera()), random(10203), videoWri
 
 	camera->setNearClipDistance(0.01f);
 	camera->setFarClipDistance(100.0f);
-	camera->setOrientation(glm::quat());
+    camera->setOrientation(glm::quat(1.0f, 0.0f, 0.0f, 0.0f));
+    camera->setYaw(-sgl::PI / 2.0f);
+    camera->setPitch(0.0f);
 	float fovy = atanf(1.0f / 2.0f) * 2.0f;
 	camera->setFOVy(fovy);
-	camera->setPosition(glm::vec3(-0.5f, -0.5f, -1.0f));
+	camera->setPosition(glm::vec3(0.5f, 0.5f, 1.0f));
 
 	Renderer->setErrorCallback(&openglErrorCallback);
 	Renderer->setDebugVerbosity(DEBUG_OUTPUT_CRITICAL_ONLY);
