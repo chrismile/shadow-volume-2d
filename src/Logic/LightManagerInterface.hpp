@@ -22,21 +22,21 @@ using namespace sgl;
 class LightManagerInterface
 {
 public:
-	LightManagerInterface() {}
-	virtual ~LightManagerInterface() {}
-	virtual void beginRenderScene()=0;
-	virtual void endRenderScene()=0;
-	virtual void beginRenderLightmap()=0;
-	virtual void renderLightmap(function<void()> renderfun)=0;
-	virtual void endRenderLightmap()=0;
-	virtual void blitMixSceneAndLights()=0;
-	virtual void renderGUI()=0;
+    LightManagerInterface() {}
+    virtual ~LightManagerInterface() {}
+    virtual void beginRenderScene()=0;
+    virtual void endRenderScene()=0;
+    virtual void beginRenderLightmap()=0;
+    virtual void renderLightmap(function<void()> renderfun)=0;
+    virtual void endRenderLightmap()=0;
+    virtual void blitMixSceneAndLights()=0;
+    virtual void renderGUI()=0;
 
-	virtual VolumeLightPtr addLight(const glm::vec2 &pos, float rad = 10.0f, const Color &col = Color(255, 255, 255))=0;
-	virtual vector<VolumeLightPtr> &getLights()=0;
+    virtual VolumeLightPtr addLight(const glm::vec2 &pos, float rad = 10.0f, const Color &col = Color(255, 255, 255))=0;
+    virtual vector<VolumeLightPtr> &getLights()=0;
 
-	virtual void onResolutionChanged()=0;
-	virtual ShaderProgramPtr getEdgeShader()=0;
+    virtual void onResolutionChanged()=0;
+    virtual ShaderProgramPtr getEdgeShader()=0;
 };
 
 

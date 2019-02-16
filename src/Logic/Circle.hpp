@@ -21,21 +21,21 @@ using namespace sgl;
 
 class CirclePrimitive : public Primitive {
 public:
-	CirclePrimitive(ShaderProgramPtr _plainShader, ShaderProgramPtr _edgeShader, const glm::mat4 &_specialTransform = matrixIdentity());
-	inline void setPosition(const glm::vec2 &pos) { position = pos; }
-	void render();
-	void renderEdges();
-	void setEdgeShader(ShaderProgramPtr _edgeShader);
+    CirclePrimitive(ShaderProgramPtr _plainShader, ShaderProgramPtr _edgeShader, const glm::mat4 &_specialTransform = matrixIdentity());
+    inline void setPosition(const glm::vec2 &pos) { position = pos; }
+    void render();
+    void renderEdges();
+    void setEdgeShader(ShaderProgramPtr _edgeShader);
 
 private:
-	ShaderProgramPtr plainShader;
-	ShaderProgramPtr edgeShader;
-	ShaderAttributesPtr circleData;
-	ShaderAttributesPtr edgeData;
-	vector<glm::vec2> vertices;
-	vector<glm::vec2> edges;
-	glm::vec2 position;
-	glm::mat4 specialTransform;
+    ShaderProgramPtr plainShader;
+    ShaderProgramPtr edgeShader;
+    ShaderAttributesPtr circleData;
+    ShaderAttributesPtr edgeData;
+    vector<glm::vec2> vertices;
+    vector<glm::vec2> edges;
+    glm::vec2 position;
+    glm::mat4 specialTransform;
 };
 
 

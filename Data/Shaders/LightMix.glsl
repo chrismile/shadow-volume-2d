@@ -8,8 +8,8 @@ out vec2 st;
 
 void main()
 {
-	st = texcoord;
-	gl_Position = vec4(position, 0., 1.);
+    st = texcoord;
+    gl_Position = vec4(position, 0., 1.);
 }
 
 -- Fragment
@@ -24,8 +24,8 @@ out vec4 fragColor;
 
 void main()
 {
-	vec4 textureRGBA = texture2D(texture, st).rgba;
-	vec3 texture = textureRGBA.rgb;
-	vec3 light = clamp(texture2D(lightTexture, st).rgb + ambientLight.rgb, 0., 1.);
-	fragColor = vec4(texture * light, textureRGBA.a);
+    vec4 textureRGBA = texture2D(texture, st).rgba;
+    vec3 texture = textureRGBA.rgb;
+    vec3 light = clamp(texture2D(lightTexture, st).rgb + ambientLight.rgb, 0., 1.);
+    fragColor = vec4(texture * light, textureRGBA.a);
 }

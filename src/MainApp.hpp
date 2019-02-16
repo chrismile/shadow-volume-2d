@@ -32,46 +32,46 @@ typedef boost::shared_ptr<Shape> ShapePtr;
 class VolumeLightApp : public AppLogic
 {
 public:
-	VolumeLightApp();
-	~VolumeLightApp();
-	void render();
-	void renderGUI();
-	void processSDLEvent(const SDL_Event &event);
-	void renderScene(); // Renders lighted scene
-	void renderEdges(); // Renders edge lines of scene that get extruded by the geometry of "edgeShader"
-	void update(float dt);
-	void resolutionChanged(EventPtr event);
+    VolumeLightApp();
+    ~VolumeLightApp();
+    void render();
+    void renderGUI();
+    void processSDLEvent(const SDL_Event &event);
+    void renderScene(); // Renders lighted scene
+    void renderEdges(); // Renders edge lines of scene that get extruded by the geometry of "edgeShader"
+    void update(float dt);
+    void resolutionChanged(EventPtr event);
 
 private:
-	// Lighting & rendering
-	boost::shared_ptr<Camera> camera;
-	boost::shared_ptr<LightManagerInterface> lightManager;
-	int lightManagerType;
-	vector<PrimitivePtr> primitives;
-	ShaderProgramPtr plainShader;
-	ShaderProgramPtr edgeShader;
-	ShaderProgramPtr whiteSolidShader;
+    // Lighting & rendering
+    boost::shared_ptr<Camera> camera;
+    boost::shared_ptr<LightManagerInterface> lightManager;
+    int lightManagerType;
+    vector<PrimitivePtr> primitives;
+    ShaderProgramPtr plainShader;
+    ShaderProgramPtr edgeShader;
+    ShaderProgramPtr whiteSolidShader;
 
-	// User interaction
-	ShaderAttributesPtr grabPointRenderData;
-	float grabPointRadius;
-	VolumeLightPtr grabbedLight;
-	XorshiftRandomGenerator random;
+    // User interaction
+    ShaderAttributesPtr grabPointRenderData;
+    float grabPointRadius;
+    VolumeLightPtr grabbedLight;
+    XorshiftRandomGenerator random;
 
-	// GUI
-	bool showSettingsWindow = true;
+    // GUI
+    bool showSettingsWindow = true;
 
-	// Benchmarking performance
-	bool benchmark;
-	float benchmarkTimer;
-	bool benchmarkFinished;
-	int maxLights;
-	int numProbes;
-	vector<vector<float>> benchmarkData;
-	vector<int> fps;
+    // Benchmarking performance
+    bool benchmark;
+    float benchmarkTimer;
+    bool benchmarkFinished;
+    int maxLights;
+    int numProbes;
+    vector<vector<float>> benchmarkData;
+    vector<int> fps;
 
-	// Save video stream to file
-	VideoWriter *videoWriter;
+    // Save video stream to file
+    VideoWriter *videoWriter;
 };
 
 #endif /* LOGIC_MainApp_HPP_ */
