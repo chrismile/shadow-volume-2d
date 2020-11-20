@@ -102,7 +102,7 @@ void LightManagerMap::renderGUI()
 	}
 
 	const char *depthFormatNames[] = {"UNORM 16-bit", "UNORM 24-bit", "UNORM 32-bit", "Float 32-bit"};
-	if (ImGui::Combo("OIT Mode", (int*)&depthFormatIndex, depthFormatNames, IM_ARRAYSIZE(depthFormatNames))) {
+	if (ImGui::Combo("Precision", (int*)&depthFormatIndex, depthFormatNames, IM_ARRAYSIZE(depthFormatNames))) {
 		if (depthFormatIndex == 0) {
 			depthFormat = GL_DEPTH_COMPONENT16;
 		} else if (depthFormatIndex == 1) {
