@@ -16,10 +16,10 @@ typedef boost::shared_ptr<Primitive> PrimitivePtr;
 
 class Primitive {
 public:
-	virtual ~Primitive() {}
-	virtual void render()=0;
-	virtual void renderEdges()=0;
-	virtual void setEdgeShader(sgl::ShaderProgramPtr _edgeShader)=0;
+    virtual ~Primitive() {}
+    virtual void render()=0;
+    virtual void renderEdges()=0;
+    virtual void setEdgeShader(sgl::ShaderProgramPtr _edgeShader)=0;
 };
 
 #endif /* LOGIC_VOLUMELIGHT_PRIMITIVE_HPP_ */

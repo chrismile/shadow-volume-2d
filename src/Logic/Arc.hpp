@@ -14,10 +14,10 @@
 using namespace std;
 
 struct SvgEllipticalArcDataIn {
-	SvgEllipticalArcDataIn() : x1(0), y1(0), x2(0), y2(0), rx(0), ry(0), deg(0), fa(0), fs(0) {}
-	SvgEllipticalArcDataIn(float _x1, float _y1, float _x2, float _y2, float _rx, float _ry, float _deg, int _fa, int _fs)
-		: x1(_x1), y1(_y1), x2(_x2), y2(_y2), rx(_rx), ry(_ry), deg(_deg), fa(_fa), fs(_fs) {}
-	float x1, y1, x2, y2, rx, ry, deg, fa, fs;
+    SvgEllipticalArcDataIn() : x1(0), y1(0), x2(0), y2(0), rx(0), ry(0), deg(0), fa(0), fs(0) {}
+    SvgEllipticalArcDataIn(float _x1, float _y1, float _x2, float _y2, float _rx, float _ry, float _deg, int _fa, int _fs)
+        : x1(_x1), y1(_y1), x2(_x2), y2(_y2), rx(_rx), ry(_ry), deg(_deg), fa(_fa), fs(_fs) {}
+    float x1, y1, x2, y2, rx, ry, deg, fa, fs;
 };
 
 void getPointsOnSvgEllipticalArc(vector<glm::vec2> &points, const SvgEllipticalArcDataIn &in);

@@ -47,7 +47,7 @@ out vec4 posPos;
 void main() {
     gl_Position = position; //vec4(pos, 0.0, 1.0);
     vec2 rcpFrame = vec2(1.0) / g_Resolution;
-	texCoord = texcoord;
+    texCoord = texcoord;
     posPos.xy = texcoord.xy;
     posPos.zw = texcoord.xy - (rcpFrame * vec2(0.5 + m_SubPixelShift));
 }
