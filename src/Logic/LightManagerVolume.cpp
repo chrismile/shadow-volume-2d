@@ -1,8 +1,33 @@
 /*
- * LightManager2.cpp
+ * BSD 3-Clause License
  *
- *  Created on: 23.04.2017
- *      Author: Christoph Neuhauser
+ * Copyright (c) 2017-2020, Christoph Neuhauser
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * * Redistributions of source code must retain the above copyright notice, this
+ *   list of conditions and the following disclaimer.
+ *
+ * * Redistributions in binary form must reproduce the above copyright notice,
+ *   this list of conditions and the following disclaimer in the documentation
+ *   and/or other materials provided with the distribution.
+ *
+ * * Neither the name of the copyright holder nor the names of its
+ *   contributors may be used to endorse or promote products derived from
+ *   this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 #include <GL/glew.h>
@@ -18,22 +43,22 @@
 
 #include "LightManagerVolume.hpp"
 
-LightManagerVolume::LightManagerVolume(CameraPtr _camera)
-{
+LightManagerVolume::LightManagerVolume(sgl::CameraPtr _camera) {
     camera = _camera;
-    sceneTarget = RenderTargetPtr(new RenderTarget());
-    lightTarget = RenderTargetPtr(new RenderTarget());
-    lightTempTarget = RenderTargetPtr(new RenderTarget());
-    lightCombineShader = ShaderManager->getShaderProgram({"LightMix.Vertex", "LightMix.Fragment"});
-    lightCombineShader->setUniform("ambientLight", Color(50, 50, 50));
-    edgeShader = ShaderManager->getShaderProgram({"VolumeLight.Vertex", "VolumeLight.Geometry", "VolumeLight.Fragment"});
+    sceneTarget = sgl::RenderTargetPtr(new sgl::RenderTarget());
+    lightTarget = sgl::RenderTargetPtr(new sgl::RenderTarget());
+    lightTempTarget = sgl::RenderTargetPtr(new sgl::RenderTarget());
+    lightCombineShader = sgl::ShaderManager->getShaderProgram(
+            {"LightMix.Vertex", "LightMix.Fragment"});
+    lightCombineShader->setUniform("ambientLight", sgl::Color(50, 50, 50));
+    edgeShader = sgl::ShaderManager->getShaderProgram(
+            {"VolumeLight.Vertex", "VolumeLight.Geometry", "VolumeLight.Fragment"});
     onResolutionChanged();
 }
 
 static bool multisampling = false;
 
-void LightManagerVolume::renderGUI()
-{
+void LightManagerVolume::renderGUI() {
     ImGui::Separator();
 
     if (ImGui::Checkbox("Multisampling", &multisampling)) {
@@ -42,122 +67,119 @@ void LightManagerVolume::renderGUI()
 }
 
 
-VolumeLightPtr LightManagerVolume::addLight(const glm::vec2 &pos, float rad, const Color &col)
-{
+VolumeLightPtr LightManagerVolume::addLight(const glm::vec2 &pos, float rad, const sgl::Color &col) {
     VolumeLightPtr light(new VolumeLight(pos, rad, col));
     lights.push_back(light);
     return light;
 }
 
-void LightManagerVolume::onResolutionChanged()
-{
-    Window *window = AppSettings::get()->getMainWindow();
+void LightManagerVolume::onResolutionChanged() {
+    sgl::Window *window = sgl::AppSettings::get()->getMainWindow();
 
-    sceneFBO = Renderer->createFBO();
+    sceneFBO = sgl::Renderer->createFBO();
     if (multisampling) {
-        sceneRenderTex = TextureManager->createMultisampledTexture(window->getWidth(), window->getHeight(), 8);
+        sceneRenderTex = sgl::TextureManager->createMultisampledTexture(window->getWidth(), window->getHeight(), 8);
     } else {
-        sceneRenderTex = TextureManager->createEmptyTexture(window->getWidth(), window->getHeight());
+        sceneRenderTex = sgl::TextureManager->createEmptyTexture(window->getWidth(), window->getHeight());
     }
     sceneFBO->bindTexture(sceneRenderTex);
     sceneTarget->bindFramebufferObject(sceneFBO);
 
-    lightFBO = Renderer->createFBO();
+    lightFBO = sgl::Renderer->createFBO();
     if (multisampling) {
-        lightRenderTex = TextureManager->createMultisampledTexture(window->getWidth(), window->getHeight(), 8);
+        lightRenderTex = sgl::TextureManager->createMultisampledTexture(window->getWidth(), window->getHeight(), 8);
     } else {
-        lightRenderTex = TextureManager->createEmptyTexture(window->getWidth(), window->getHeight());
+        lightRenderTex = sgl::TextureManager->createEmptyTexture(window->getWidth(), window->getHeight());
     }
     lightFBO->bindTexture(lightRenderTex);
     lightTarget->bindFramebufferObject(lightFBO);
 
-    lightTempFBO = Renderer->createFBO();
-    lightTempTex = TextureManager->createEmptyTexture(window->getWidth(), window->getHeight());
+    lightTempFBO = sgl::Renderer->createFBO();
+    lightTempTex = sgl::TextureManager->createEmptyTexture(window->getWidth(), window->getHeight());
     lightTempFBO->bindTexture(lightTempTex);
     lightTempTarget->bindFramebufferObject(lightTempFBO);
 }
 
-void LightManagerVolume::beginRenderScene()
-{
+void LightManagerVolume::beginRenderScene() {
     camera->setRenderTarget(sceneTarget);
     sceneTarget->bindRenderTarget();
-    Renderer->clearFramebuffer(GL_COLOR_BUFFER_BIT, Color(242, 242, 242));
+    sgl::Renderer->clearFramebuffer(GL_COLOR_BUFFER_BIT, sgl::Color(242, 242, 242));
 
     // Now render scene (user)
 }
 
-void LightManagerVolume::endRenderScene()
-{
-    Renderer->unbindFBO();
-    sceneTex = Renderer->resolveMultisampledTexture(sceneRenderTex);
-    Renderer->unbindFBO();
+void LightManagerVolume::endRenderScene() {
+    sgl::Renderer->unbindFBO();
+    sceneTex = sgl::Renderer->resolveMultisampledTexture(sceneRenderTex);
+    sgl::Renderer->unbindFBO();
 }
 
 
-void LightManagerVolume::renderLightmap(function<void()> renderfun) {
+void LightManagerVolume::renderLightmap(std::function<void()> renderfun) {
     lightTempTarget->bindRenderTarget();
-    Renderer->clearFramebuffer(GL_COLOR_BUFFER_BIT, Color(0, 0, 0));
+    sgl::Renderer->clearFramebuffer(GL_COLOR_BUFFER_BIT, sgl::Color(0, 0, 0));
 
     for (VolumeLightPtr &light : lights) {
         lightTarget->bindRenderTarget();
-        Renderer->setBlendMode(BLEND_SUBTRACTIVE);
-        Renderer->clearFramebuffer(GL_COLOR_BUFFER_BIT, light->getColor());
+        sgl::Renderer->setBlendMode(sgl::BLEND_SUBTRACTIVE);
+        sgl::Renderer->clearFramebuffer(GL_COLOR_BUFFER_BIT, light->getColor());
         edgeShader->setUniform("lightpos", light->position);
         renderfun();
 
         lightTempTarget->bindRenderTarget();
-        Renderer->setBlendMode(BLEND_ADDITIVE);
-        Renderer->setProjectionMatrix(matrixIdentity());
-        Renderer->setViewMatrix(matrixIdentity());
-        Renderer->setModelMatrix(matrixIdentity());
-        Renderer->blitTexture(lightRenderTex, AABB2(glm::vec2(-1, -1), glm::vec2(1, 1)));
+        sgl::Renderer->setBlendMode(sgl::BLEND_ADDITIVE);
+        sgl::Renderer->setProjectionMatrix(sgl::matrixIdentity());
+        sgl::Renderer->setViewMatrix(sgl::matrixIdentity());
+        sgl::Renderer->setModelMatrix(sgl::matrixIdentity());
+        sgl::Renderer->blitTexture(
+                lightRenderTex, sgl::AABB2(glm::vec2(-1, -1), glm::vec2(1, 1)));
     }
-    Renderer->setBlendMode(BLEND_ALPHA);
+    sgl::Renderer->setBlendMode(sgl::BLEND_ALPHA);
 }
 
-void LightManagerVolume::beginRenderLightmap()
-{
+void LightManagerVolume::beginRenderLightmap() {
     camera->setRenderTarget(lightTarget);
 }
 
-void LightManagerVolume::endRenderLightmap()
-{
-    Renderer->setBlendMode(BLEND_ALPHA);
-    Renderer->unbindFBO();
+void LightManagerVolume::endRenderLightmap() {
+    sgl::Renderer->setBlendMode(sgl::BLEND_ALPHA);
+    sgl::Renderer->unbindFBO();
 
-    //lightTex = Renderer->resolveMultisampledTexture(lightRenderTex);
+    //lightTex = sgl::Renderer->resolveMultisampledTexture(lightRenderTex);
     bool blur = false;
     bool fxaa = false;
     if (blur) {
-        Renderer->blurTexture(lightTempTex);
+        sgl::Renderer->blurTexture(lightTempTex);
     }
 
     if (fxaa) {
-        Window *window = AppSettings::get()->getMainWindow();
-        TexturePtr texFXAA = TextureManager->createEmptyTexture(window->getWidth(), window->getHeight());
-        FramebufferObjectPtr fboFXAA = Renderer->createFBO();
+        sgl::Window *window = sgl::AppSettings::get()->getMainWindow();
+        sgl::TexturePtr texFXAA = sgl::TextureManager->createEmptyTexture(window->getWidth(), window->getHeight());
+        sgl::FramebufferObjectPtr fboFXAA = sgl::Renderer->createFBO();
         fboFXAA->bindTexture(texFXAA);
-        Renderer->bindFBO(fboFXAA);
-        Renderer->blitTextureFXAAAntialiased(lightTempTex);
+        sgl::Renderer->bindFBO(fboFXAA);
+        sgl::Renderer->blitTextureFXAAAntialiased(lightTempTex);
         lightTempTex = texFXAA;
         lightTempFBO->bindTexture(lightTempTex);
     }
 
-    Renderer->unbindFBO();
+    sgl::Renderer->unbindFBO();
 }
 
-void LightManagerVolume::blitMixSceneAndLights()
-{
-    Renderer->setProjectionMatrix(matrixIdentity());
-    Renderer->setViewMatrix(matrixIdentity());
-    Renderer->setModelMatrix(matrixIdentity());
+void LightManagerVolume::blitMixSceneAndLights() {
+    sgl::Renderer->setProjectionMatrix(sgl::matrixIdentity());
+    sgl::Renderer->setViewMatrix(sgl::matrixIdentity());
+    sgl::Renderer->setModelMatrix(sgl::matrixIdentity());
 
-    if (Keyboard->isKeyDown(SDLK_s)) {
-        Renderer->blitTexture(sceneTex, AABB2(glm::vec2(-1, -1), glm::vec2(1, 1)));
-    } else if (Keyboard->isKeyDown(SDLK_d)) {
-        Renderer->blitTexture(lightTempTex, AABB2(glm::vec2(-1, -1), glm::vec2(1, 1)));
+    if (sgl::Keyboard->isKeyDown(SDLK_s)) {
+        sgl::Renderer->blitTexture(
+                sceneTex, sgl::AABB2(glm::vec2(-1, -1), glm::vec2(1, 1)));
+    } else if (sgl::Keyboard->isKeyDown(SDLK_d)) {
+        sgl::Renderer->blitTexture(
+                lightTempTex, sgl::AABB2(glm::vec2(-1, -1), glm::vec2(1, 1)));
     } else {
         lightCombineShader->setUniform("lightTexture", lightTempTex, 1);
-        Renderer->blitTexture(sceneTex, AABB2(glm::vec2(-1, -1), glm::vec2(1, 1)), lightCombineShader);
+        sgl::Renderer->blitTexture(
+                sceneTex, sgl::AABB2(glm::vec2(-1, -1), glm::vec2(1, 1)), lightCombineShader);
     }
 }

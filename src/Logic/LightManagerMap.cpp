@@ -1,8 +1,33 @@
 /*
- * LightManager2.cpp
+ * BSD 3-Clause License
  *
- *  Created on: 23.04.2017
- *      Author: christoph
+ * Copyright (c) 2017-2020, Christoph Neuhauser
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * * Redistributions of source code must retain the above copyright notice, this
+ *   list of conditions and the following disclaimer.
+ *
+ * * Redistributions in binary form must reproduce the above copyright notice,
+ *   this list of conditions and the following disclaimer in the documentation
+ *   and/or other materials provided with the distribution.
+ *
+ * * Neither the name of the copyright holder nor the names of its
+ *   contributors may be used to endorse or promote products derived from
+ *   this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 #include <vector>
@@ -38,7 +63,7 @@ GLuint createShadowmapTex(int res) {
     return texture;
 }
 
-ShaderAttributesPtr createFullscreenQuadRenderData(ShaderProgramPtr shader, AABB2 sceneRect) {
+sgl::ShaderAttributesPtr createFullscreenQuadRenderData(sgl::ShaderProgramPtr shader, sgl::AABB2 sceneRect) {
     // Set up the vertex data of the rectangle
     std::vector<glm::vec2> fullscreenQuad{
         glm::vec2(sceneRect.max.x, sceneRect.max.y),
@@ -49,23 +74,23 @@ ShaderAttributesPtr createFullscreenQuadRenderData(ShaderProgramPtr shader, AABB
         glm::vec2(sceneRect.min.x, sceneRect.max.y)};
 
     // Feed the shader with the data
-    GeometryBufferPtr geomBuffer = Renderer->createGeometryBuffer(sizeof(glm::vec2)*fullscreenQuad.size(), &fullscreenQuad.front());
-    ShaderAttributesPtr shaderAttributes = ShaderManager->createShaderAttributes(shader);
-    shaderAttributes->addGeometryBuffer(geomBuffer, "position", ATTRIB_FLOAT, 2);
+    sgl::GeometryBufferPtr geomBuffer = sgl::Renderer->createGeometryBuffer(
+            sizeof(glm::vec2)*fullscreenQuad.size(), &fullscreenQuad.front());
+    sgl::ShaderAttributesPtr shaderAttributes = sgl::ShaderManager->createShaderAttributes(shader);
+    shaderAttributes->addGeometryBuffer(geomBuffer, "position", sgl::ATTRIB_FLOAT, 2);
     return shaderAttributes;
 }
 
-LightManagerMap::LightManagerMap(CameraPtr _camera)
-{
+LightManagerMap::LightManagerMap(sgl::CameraPtr _camera) {
     camera = _camera;
-    sceneTarget = RenderTargetPtr(new RenderTarget());
-    lightTarget = RenderTargetPtr(new RenderTarget());
-    shadowmapTarget = RenderTargetPtr(new RenderTarget());
-    lightCombineShader = ShaderManager->getShaderProgram({"LightMix.Vertex", "LightMix.Fragment"});
-    lightCombineShader->setUniform("ambientLight", Color(50, 50, 50));
-    shadowmapShader = ShaderManager->getShaderProgram({"ShadowMapVolume.Vertex",
+    sceneTarget = sgl::RenderTargetPtr(new sgl::RenderTarget());
+    lightTarget = sgl::RenderTargetPtr(new sgl::RenderTarget());
+    shadowmapTarget = sgl::RenderTargetPtr(new sgl::RenderTarget());
+    lightCombineShader = sgl::ShaderManager->getShaderProgram({"LightMix.Vertex", "LightMix.Fragment"});
+    lightCombineShader->setUniform("ambientLight", sgl::Color(50, 50, 50));
+    shadowmapShader = sgl::ShaderManager->getShaderProgram({"ShadowMapVolume.Vertex",
             "ShadowMapVolume.Geometry", "ShadowMapVolume.Fragment"});
-    shadowMapRenderShader = ShaderManager->getShaderProgram({"ShadowMapRender.Vertex",
+    shadowMapRenderShader = sgl::ShaderManager->getShaderProgram({"ShadowMapRender.Vertex",
         "ShadowMapRender.Fragment"});
     onResolutionChanged();
 
@@ -88,8 +113,7 @@ static int shadowMapWidth = 2048;
 static bool multisampling = false;
 static int depthFormatIndex = 0;
 
-void LightManagerMap::renderGUI()
-{
+void LightManagerMap::renderGUI() {
     ImGui::Separator();
 
     ImGui::Text("Shadow Map Resolution:");
@@ -118,65 +142,58 @@ void LightManagerMap::renderGUI()
 
 
 
-/*glDrawBuffer(GL_NONE);
-glReadBuffer(GL_NONE);
-glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, lightTex, 0);*/
-
-VolumeLightPtr LightManagerMap::addLight(const glm::vec2 &pos, float rad, const Color &col)
-{
+VolumeLightPtr LightManagerMap::addLight(const glm::vec2 &pos, float rad, const sgl::Color &col) {
     VolumeLightPtr light(new VolumeLight(pos, rad, col));
     lights.push_back(light);
     onResolutionChanged();
     return light;
 }
 
-void LightManagerMap::onResolutionChanged()
-{
-    Window *window = AppSettings::get()->getMainWindow();
+void LightManagerMap::onResolutionChanged() {
+    sgl::Window *window = sgl::AppSettings::get()->getMainWindow();
 
-    sceneFBO = Renderer->createFBO();
+    sceneFBO = sgl::Renderer->createFBO();
     if (multisampling) {
-        sceneRenderTex = TextureManager->createMultisampledTexture(window->getWidth(), window->getHeight(), 8);
+        sceneRenderTex = sgl::TextureManager->createMultisampledTexture(window->getWidth(), window->getHeight(), 8);
     } else {
-        sceneRenderTex = TextureManager->createEmptyTexture(window->getWidth(), window->getHeight());
+        sceneRenderTex = sgl::TextureManager->createEmptyTexture(window->getWidth(), window->getHeight());
     }
     sceneFBO->bindTexture(sceneRenderTex);
     sceneTarget->bindFramebufferObject(sceneFBO);
 
-    lightFBO = Renderer->createFBO();
-    lightTex = TextureManager->createEmptyTexture(window->getWidth(), window->getHeight());
+    lightFBO = sgl::Renderer->createFBO();
+    lightTex = sgl::TextureManager->createEmptyTexture(window->getWidth(), window->getHeight());
     lightFBO->bindTexture(lightTex);
     lightTarget->bindFramebufferObject(lightFBO);
 
     // Create shadow map
-    TextureSettings settings(TEXTURE_2D_ARRAY, GL_LINEAR, GL_LINEAR, GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE);
+    sgl::TextureSettings settings(
+            sgl::TEXTURE_2D_ARRAY, GL_LINEAR, GL_LINEAR, GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE);
     settings.internalFormat = depthFormat;
     settings.pixelFormat = GL_RED;
     settings.pixelType = GL_FLOAT;
-    TextureGL *texGL = new TextureGL(createShadowmapTex(shadowMapWidth), shadowMapWidth, 1, 16, settings);
-    shadowmap = TexturePtr(texGL);
-    shadowmapFBO = Renderer->createFBO();
-    shadowmapFBO->bindTexture(shadowmap, DEPTH_ATTACHMENT);
+    sgl::TextureGL *texGL = new sgl::TextureGL(createShadowmapTex(shadowMapWidth), shadowMapWidth, 1, 16, settings);
+    shadowmap = sgl::TexturePtr(texGL);
+    shadowmapFBO = sgl::Renderer->createFBO();
+    shadowmapFBO->bindTexture(shadowmap, sgl::DEPTH_ATTACHMENT);
     shadowmapTarget->bindFramebufferObject(shadowmapFBO);
 
-    AABB2 camRect = camera->getAABB2(0.0f);
+    sgl::AABB2 camRect = camera->getAABB2(0.0f);
     shadowmapRenderAttributes = createFullscreenQuadRenderData(shadowMapRenderShader, camRect);
 }
 
-void LightManagerMap::beginRenderScene()
-{
+void LightManagerMap::beginRenderScene() {
     camera->setRenderTarget(sceneTarget);
     sceneTarget->bindRenderTarget();
-    Renderer->clearFramebuffer(GL_COLOR_BUFFER_BIT, Color(242, 242, 242));
+    sgl::Renderer->clearFramebuffer(GL_COLOR_BUFFER_BIT, sgl::Color(242, 242, 242));
 
     // Now render scene (user)
 }
 
-void LightManagerMap::endRenderScene()
-{
-    Renderer->unbindFBO();
+void LightManagerMap::endRenderScene() {
+    sgl::Renderer->unbindFBO();
 
-    sceneTex = Renderer->resolveMultisampledTexture(sceneRenderTex);
+    sceneTex = sgl::Renderer->resolveMultisampledTexture(sceneRenderTex);
 
     /*TexturePtr texFXAA = TextureManager->createEmptyTexture(window->getWidth(), window->getHeight());
     FramebufferObjectPtr fboFXAA = Renderer->createFBO();
@@ -185,21 +202,23 @@ void LightManagerMap::endRenderScene()
     Renderer->blitTextureFXAAAntialiased(tex);
     tex = texFXAA;*/
 
-    Renderer->unbindFBO();
+    sgl::Renderer->unbindFBO();
 }
 
 
-void LightManagerMap::renderLightmap(function<void()> renderfun) {
+void LightManagerMap::renderLightmap(std::function<void()> renderfun) {
     for (VolumeLightPtr &light : lights) {
-        Renderer->setBlendMode(BLEND_ALPHA);
-        Renderer->setViewMatrix(camera->getViewMatrix());
-        Renderer->setProjectionMatrix(camera->getProjectionMatrix());
+        sgl::Renderer->setBlendMode(sgl::BLEND_ALPHA);
+        sgl::Renderer->setViewMatrix(camera->getViewMatrix());
+        sgl::Renderer->setProjectionMatrix(camera->getProjectionMatrix());
         shadowmapTarget->bindRenderTarget();
-        Renderer->clearFramebuffer(GL_DEPTH_BUFFER_BIT, light->getColor(), 1.0f);
+        sgl::Renderer->clearFramebuffer(GL_DEPTH_BUFFER_BIT, light->getColor(), 1.0f);
         shadowmapShader->setUniform("lightpos", light->getPosition());
         int matUniformLoc = shadowmapShader->getUniformLoc("camViewProjMatrices");
         for (int i = 0; i < 3; ++i) {
-            shadowmapShader->setUniform(matUniformLoc+i, lightcamProj[i]*lightcamView[i]*matrixTranslation(-light->getPosition()));
+            shadowmapShader->setUniform(
+                    matUniformLoc+i,
+                    lightcamProj[i]*lightcamView[i]*sgl::matrixTranslation(-light->getPosition()));
         }
         /*shadowmapShader->bind();
         glm::mat4 matrices[3];
@@ -215,46 +234,46 @@ void LightManagerMap::renderLightmap(function<void()> renderfun) {
         glViewport(0,0,shadowMapWidth,1);
         renderfun();
         glDisable(GL_DEPTH_TEST);
-        Window *window = AppSettings::get()->getMainWindow();
+        sgl::Window *window = sgl::AppSettings::get()->getMainWindow();
         glViewport(0,0,window->getWidth(),window->getHeight());
 
         lightTarget->bindRenderTarget();
-        Renderer->setBlendMode(BLEND_ADDITIVE);
-        Renderer->setViewMatrix(camera->getViewMatrix());
-        Renderer->setProjectionMatrix(camera->getProjectionMatrix());
-        Renderer->setModelMatrix(matrixIdentity());
+        sgl::Renderer->setBlendMode(sgl::BLEND_ADDITIVE);
+        sgl::Renderer->setViewMatrix(camera->getViewMatrix());
+        sgl::Renderer->setProjectionMatrix(camera->getProjectionMatrix());
+        sgl::Renderer->setModelMatrix(sgl::matrixIdentity());
         shadowMapRenderShader->setUniform("lightpos", light->getPosition());
         shadowMapRenderShader->setUniform("lightColor", light->getColor());
-        Renderer->render(shadowmapRenderAttributes);
+        sgl::Renderer->render(shadowmapRenderAttributes);
     }
-    Renderer->setBlendMode(BLEND_ALPHA);
+    sgl::Renderer->setBlendMode(sgl::BLEND_ALPHA);
 }
 
-void LightManagerMap::beginRenderLightmap()
-{
+void LightManagerMap::beginRenderLightmap() {
     camera->setRenderTarget(lightTarget);
     lightTarget->bindRenderTarget();
-    Renderer->clearFramebuffer(GL_COLOR_BUFFER_BIT, Color(0, 0, 0));
+    sgl::Renderer->clearFramebuffer(GL_COLOR_BUFFER_BIT, sgl::Color(0, 0, 0));
 }
 
-void LightManagerMap::endRenderLightmap()
-{
-    Renderer->setBlendMode(BLEND_ALPHA);
-    Renderer->unbindFBO();
+void LightManagerMap::endRenderLightmap() {
+    sgl::Renderer->setBlendMode(sgl::BLEND_ALPHA);
+    sgl::Renderer->unbindFBO();
 }
 
-void LightManagerMap::blitMixSceneAndLights()
-{
-    Renderer->setProjectionMatrix(matrixIdentity());
-    Renderer->setViewMatrix(matrixIdentity());
-    Renderer->setModelMatrix(matrixIdentity());
+void LightManagerMap::blitMixSceneAndLights() {
+    sgl::Renderer->setProjectionMatrix(sgl::matrixIdentity());
+    sgl::Renderer->setViewMatrix(sgl::matrixIdentity());
+    sgl::Renderer->setModelMatrix(sgl::matrixIdentity());
 
-    if (Keyboard->isKeyDown(SDLK_s)) {
-        Renderer->blitTexture(sceneTex, AABB2(glm::vec2(-1, -1), glm::vec2(1, 1)));
-    } else if (Keyboard->isKeyDown(SDLK_d)) {
-        Renderer->blitTexture(lightTex, AABB2(glm::vec2(-1, -1), glm::vec2(1, 1)));
+    if (sgl::Keyboard->isKeyDown(SDLK_s)) {
+        sgl::Renderer->blitTexture(
+                sceneTex, sgl::AABB2(glm::vec2(-1, -1), glm::vec2(1, 1)));
+    } else if (sgl::Keyboard->isKeyDown(SDLK_d)) {
+        sgl::Renderer->blitTexture(
+                lightTex, sgl::AABB2(glm::vec2(-1, -1), glm::vec2(1, 1)));
     } else {
         lightCombineShader->setUniform("lightTexture", lightTex, 1);
-        Renderer->blitTexture(sceneTex, AABB2(glm::vec2(-1, -1), glm::vec2(1, 1)), lightCombineShader);
+        sgl::Renderer->blitTexture(
+                sceneTex, sgl::AABB2(glm::vec2(-1, -1), glm::vec2(1, 1)), lightCombineShader);
     }
 }

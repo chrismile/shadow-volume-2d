@@ -1,15 +1,40 @@
 /*
- * Arc.cpp
+ * BSD 3-Clause License
  *
- *  Created on: 03.12.2014
- *      Author: Christoph Neuhauser
+ * Copyright (c) 2017-2020, Christoph Neuhauser
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * * Redistributions of source code must retain the above copyright notice, this
+ *   list of conditions and the following disclaimer.
+ *
+ * * Redistributions in binary form must reproduce the above copyright notice,
+ *   this list of conditions and the following disclaimer in the documentation
+ *   and/or other materials provided with the distribution.
+ *
+ * * Neither the name of the copyright holder nor the names of its
+ *   contributors may be used to endorse or promote products derived from
+ *   this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 #include "Arc.hpp"
 #include <Math/Math.hpp>
 
 // See http://www.w3.org/TR/SVG/implnote.html#ArcImplementationNotes for a more precise description of the implementation
-void getPointsOnSvgEllipticalArc(vector<glm::vec2> &points, const SvgEllipticalArcDataIn &in) {
+void getPointsOnSvgEllipticalArc(std::vector<glm::vec2> &points, const SvgEllipticalArcDataIn &in) {
     float x1 = in.x1; // Starting point of the arc
     float y1 = in.y1;
     float x2 = in.x2; // End point of the arc
@@ -91,14 +116,15 @@ void getPointsOnSvgEllipticalArc(vector<glm::vec2> &points, const SvgEllipticalA
     }*/
     int numSegments = sgl::max(2, int(sgl::abs(arcAngle)/(sgl::TWO_PI)*ellipseSegments));
 
-    vector<glm::vec2> arcPoints;
+    std::vector<glm::vec2> arcPoints;
     getPointsOnEllipseArc(arcPoints, glm::vec2(cx, cy), rx, ry, startAngle, arcAngle, numSegments);
     points.insert(points.end(), arcPoints.begin(), arcPoints.end());
 }
 
 // direction: +1 -> CCW, -1 -> CW
-void getPointsOnCircleArc(vector<glm::vec2> &points, const glm::vec2 &center, float radius, const glm::vec2 &start, const glm::vec2 &end, int direction)
-{
+void getPointsOnCircleArc(
+        std::vector<glm::vec2> &points, const glm::vec2 &center, float radius,
+        const glm::vec2 &start, const glm::vec2 &end, int direction) {
     // Compute the start and end angles with the arc tangent of the point vectors (-> angles on the unit circle)
     glm::vec2 normalStart = glm::normalize(start-center);
     glm::vec2 normalEnd = glm::normalize(end-center);
@@ -134,8 +160,7 @@ void getPointsOnCircleArc(vector<glm::vec2> &points, const glm::vec2 &center, fl
     }
 }
 
-void getPointsOnCircle(vector<glm::vec2> &points, const glm::vec2 &center, float radius, int numSegments)
-{
+void getPointsOnCircle(std::vector<glm::vec2> &points, const glm::vec2 &center, float radius, int numSegments) {
     float theta = 2 * 3.1415926f / float(numSegments);
     float tangetialFactor = tan(theta);
     float radialFactor = cos(theta);
@@ -155,8 +180,9 @@ void getPointsOnCircle(vector<glm::vec2> &points, const glm::vec2 &center, float
     }
 }
 
-void getPointsOnCircleArc(vector<glm::vec2> &points, const glm::vec2 &center, float radius, float startAngle, float arcAngle, int numSegments)
-{
+void getPointsOnCircleArc(
+        std::vector<glm::vec2> &points, const glm::vec2 &center, float radius, float startAngle, float arcAngle,
+        int numSegments) {
     float theta = arcAngle / float(numSegments - 1); // The arc is open => numSegments - 1
     float tangetialFactor = tan(theta);
     float radialFactor = cos(theta);
@@ -176,8 +202,8 @@ void getPointsOnCircleArc(vector<glm::vec2> &points, const glm::vec2 &center, fl
     }
 }
 
-void getPointsOnEllipse(vector<glm::vec2> &points, const glm::vec2 &center, float radiusx, float radiusy, int numSegments)
-{
+void getPointsOnEllipse(
+        std::vector<glm::vec2> &points, const glm::vec2 &center, float radiusx, float radiusy, int numSegments) {
     float theta = 2 * 3.1415926f / float(numSegments);
     float tangetialFactor = tan(theta);
     float radialFactor = cos(theta);
@@ -197,8 +223,9 @@ void getPointsOnEllipse(vector<glm::vec2> &points, const glm::vec2 &center, floa
     }
 }
 
-void getPointsOnEllipseArc(vector<glm::vec2> &points, const glm::vec2 &center, float radiusx, float radiusy, float startAngle, float arcAngle, int numSegments)
-{
+void getPointsOnEllipseArc(
+        std::vector<glm::vec2> &points, const glm::vec2 &center, float radiusx, float radiusy,
+        float startAngle, float arcAngle, int numSegments) {
     float theta = arcAngle / float(numSegments - 1); // The arc is open => numSegments - 1
     float tangetialFactor = tan(theta);
     float radialFactor = cos(theta);
