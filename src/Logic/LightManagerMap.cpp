@@ -154,9 +154,11 @@ void LightManagerMap::onResolutionChanged() {
 
     sceneFBO = sgl::Renderer->createFBO();
     if (multisampling) {
-        sceneRenderTex = sgl::TextureManager->createMultisampledTexture(window->getWidth(), window->getHeight(), 8);
+        sceneRenderTex = sgl::TextureManager->createMultisampledTexture(
+                window->getWidth(), window->getHeight(), 8);
     } else {
-        sceneRenderTex = sgl::TextureManager->createEmptyTexture(window->getWidth(), window->getHeight());
+        sceneRenderTex = sgl::TextureManager->createEmptyTexture(
+                window->getWidth(), window->getHeight());
     }
     sceneFBO->bindTexture(sceneRenderTex);
     sceneTarget->bindFramebufferObject(sceneFBO);
@@ -170,9 +172,8 @@ void LightManagerMap::onResolutionChanged() {
     sgl::TextureSettings settings(
             sgl::TEXTURE_2D_ARRAY, GL_LINEAR, GL_LINEAR, GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE);
     settings.internalFormat = depthFormat;
-    settings.pixelFormat = GL_RED;
-    settings.pixelType = GL_FLOAT;
-    sgl::TextureGL *texGL = new sgl::TextureGL(createShadowmapTex(shadowMapWidth), shadowMapWidth, 1, 16, settings);
+    sgl::TextureGL *texGL = new sgl::TextureGL(
+            createShadowmapTex(shadowMapWidth), shadowMapWidth, 1, 16, settings);
     shadowmap = sgl::TexturePtr(texGL);
     shadowmapFBO = sgl::Renderer->createFBO();
     shadowmapFBO->bindTexture(shadowmap, sgl::DEPTH_ATTACHMENT);
