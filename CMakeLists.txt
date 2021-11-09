@@ -32,7 +32,6 @@ if((${CMAKE_GENERATOR} STREQUAL "MinGW Makefiles") OR (${CMAKE_GENERATOR} STREQU
 endif()
 target_link_libraries(shadows-2d SDL2::Main)
 
-cmake_policy(SET CMP0012 NEW)
 find_package(sgl REQUIRED)
 find_package(Boost COMPONENTS system filesystem REQUIRED)
 find_package(GLEW REQUIRED)
