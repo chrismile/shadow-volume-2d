@@ -39,17 +39,17 @@ uniform vec2 g_Resolution;
 
 uniform float m_SubPixelShift;
 
-in vec2 texcoord;
-in vec4 position;
+in vec4 vertexPosition;
+in vec2 vertexTexCoord;
 out vec2 texCoord;
 out vec4 posPos;
 
 void main() {
-    gl_Position = position; //vec4(pos, 0.0, 1.0);
+    gl_Position = vertexPosition; //vec4(pos, 0.0, 1.0);
     vec2 rcpFrame = vec2(1.0) / g_Resolution;
-    texCoord = texcoord;
-    posPos.xy = texcoord.xy;
-    posPos.zw = texcoord.xy - (rcpFrame * vec2(0.5 + m_SubPixelShift));
+    texCoord = vertexTexCoord;
+    posPos.xy = vertexTexCoord.xy;
+    posPos.zw = vertexTexCoord.xy - (rcpFrame * vec2(0.5 + m_SubPixelShift));
 }
 
 -- Fragment
@@ -89,7 +89,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-uniform sampler2D texture;
+uniform sampler2D inputTexture;
 uniform vec2 g_Resolution;
 
 uniform float m_VxOffset;
@@ -100,17 +100,17 @@ in vec2 texCoord;
 in vec4 posPos;
 out vec4 fragColor;
 
-#define FxaaTex(t, p) texture2D(t, p)
+#define FxaaTex(t, p) texture(t, p)
 
 #if __VERSION__ >= 130
     #define OffsetVec(a, b) ivec2(a, b)
     #define FxaaTexOff(t, p, o, r) textureOffset(t, p, o)
 #elif defined(GL_EXT_gpu_shader4)
     #define OffsetVec(a, b) ivec2(a, b)
-    #define FxaaTexOff(t, p, o, r) texture2DLodOffset(t, p, 0.0, o)
+    #define FxaaTexOff(t, p, o, r) textureLodOffset(t, p, 0.0, o)
 #else
     #define OffsetVec(a, b) vec2(a, b)
-    #define FxaaTexOff(t, p, o, r) texture2D(t, p + o * r)
+    #define FxaaTexOff(t, p, o, r) texture(t, p + o * r)
 #endif
 
 vec3 FxaaPixelShader(
@@ -174,5 +174,5 @@ vec3 FxaaPixelShader(
 void main()
 {
     vec2 rcpFrame = vec2(1.0) / g_Resolution;
-    fragColor = vec4(FxaaPixelShader(posPos, texture, rcpFrame), 1.0);
+    fragColor = vec4(FxaaPixelShader(posPos, inputTexture, rcpFrame), 1.0);
 }

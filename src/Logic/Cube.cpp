@@ -40,17 +40,28 @@ Cube::Cube(
     specialTransform = _specialTransform;
     plainShader = _plainShader;
     edgeShader = _edgeShader;
-    edges = { glm::vec2(-extent.x, -extent.y), glm::vec2(extent.x, -extent.y), glm::vec2(extent.x, extent.y), glm::vec2(-extent.x, extent.y) };
-    vertices = { glm::vec2(extent.x, -extent.y), glm::vec2(extent.x, extent.y), glm::vec2(-extent.x, -extent.y), glm::vec2(-extent.x, extent.y) };
+    edges = {
+            glm::vec2(-extent.x, -extent.y),
+            glm::vec2(extent.x, -extent.y),
+            glm::vec2(extent.x, extent.y),
+            glm::vec2(-extent.x, extent.y)
+    };
+    vertices = {
+            glm::vec2(extent.x, -extent.y),
+            glm::vec2(extent.x, extent.y),
+            glm::vec2(-extent.x, -extent.y),
+            glm::vec2(-extent.x, extent.y)
+    };
 
     cubeData = sgl::ShaderManager->createShaderAttributes(plainShader);
-    sgl::GeometryBufferPtr geometryBuffer = sgl::Renderer->createGeometryBuffer(sizeof(glm::vec2)*vertices.size(), &vertices.front());
-    cubeData->addGeometryBuffer(geometryBuffer, "position", sgl::ATTRIB_FLOAT, 2);
+    sgl::GeometryBufferPtr geometryBuffer = sgl::Renderer->createGeometryBuffer(
+            sizeof(glm::vec2)*vertices.size(), &vertices.front());
+    cubeData->addGeometryBuffer(geometryBuffer, "vertexPosition", sgl::ATTRIB_FLOAT, 2);
     cubeData->setVertexMode(sgl::VERTEX_MODE_TRIANGLE_STRIP);
 
     edgeData = sgl::ShaderManager->createShaderAttributes(edgeShader);
     geometryBuffer = sgl::Renderer->createGeometryBuffer(sizeof(glm::vec2)*edges.size(), &edges.front());
-    edgeData->addGeometryBuffer(geometryBuffer, "position", sgl::ATTRIB_FLOAT, 2);
+    edgeData->addGeometryBuffer(geometryBuffer, "vertexPosition", sgl::ATTRIB_FLOAT, 2);
     edgeData->setVertexMode(sgl::VERTEX_MODE_LINE_LOOP);
 }
 

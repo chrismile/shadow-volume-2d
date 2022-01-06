@@ -112,7 +112,7 @@ VolumeLightApp::VolumeLightApp() : camera(new sgl::Camera()), random(10203), vid
     sgl::GeometryBufferPtr geometryBuffer = sgl::Renderer->createGeometryBuffer(
             sizeof(glm::vec2)*vertices.size(), &vertices.front());
     grabPointRenderData->addGeometryBuffer(
-            geometryBuffer, "position", sgl::ATTRIB_FLOAT, 2);
+            geometryBuffer, "vertexPosition", sgl::ATTRIB_FLOAT, 2);
     grabPointRenderData->setVertexMode(sgl::VERTEX_MODE_TRIANGLE_FAN);
 
     resolutionChanged(sgl::EventPtr());

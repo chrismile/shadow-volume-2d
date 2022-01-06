@@ -77,7 +77,7 @@ sgl::ShaderAttributesPtr createFullscreenQuadRenderData(sgl::ShaderProgramPtr sh
     sgl::GeometryBufferPtr geomBuffer = sgl::Renderer->createGeometryBuffer(
             sizeof(glm::vec2)*fullscreenQuad.size(), &fullscreenQuad.front());
     sgl::ShaderAttributesPtr shaderAttributes = sgl::ShaderManager->createShaderAttributes(shader);
-    shaderAttributes->addGeometryBuffer(geomBuffer, "position", sgl::ATTRIB_FLOAT, 2);
+    shaderAttributes->addGeometryBuffer(geomBuffer, "vertexPosition", sgl::ATTRIB_FLOAT, 2);
     return shaderAttributes;
 }
 
